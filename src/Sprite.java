@@ -1,47 +1,63 @@
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
-import java.awt.image.AffineTransformOp;
-import java.awt.image.BufferedImage;
-import java.io.File;
+import java.util.ArrayList;
 
 /**
  * This class models a rectangular movable object on the screen.  It is drawn using an image.
+ * Sprite is a moving object
  */
-public abstract class Sprite {
+public class Sprite {
 
-    public static final int NORTH = 90, SOUTH = 270, WEST = 180, EAST = 0, NE = 45, NW = 135, SW = 225, SE = 315;
     private static int nextID = 1; //static instance fields- there is ONE shared variable for all objects of this class.
+    private static double standardRadius = 10;
+
     private double xpos;
     private double ypos;
-    private double xdelta;
-    private double ydelta;
-    private double mass;
+    private Vector delta; //m/s
+    private double mass; // kg
+    private double radius;
+    private Color color;
     private int id;
 
+    private double small = 1. / 60;
 
-    public Sprite() {
+    public Sprite(double xpos, double ypos, Vector initial, double mass) {
+        this(xpos, ypos, initial, mass, standardRadius, new Color((int)(Math.random() * 255), (int)(Math.random() * 255), (int)(Math.random() * 255)));
+    }
+
+    public Sprite(double ixpos, double iypos, Vector initial, double mass, double radius, Color color) {
+        xpos = ixpos;
+        ypos = iypos;
+        delta = initial;
+        this.mass = mass;
+        this.radius = radius;
+        this.color = color;
 
         id = nextID;
         nextID++;
     }
 
-    /**
-     * This draws the image pic at the Point loc, rotated to face dir.
-     */
-
     public void draw(Graphics2D g2) {
-        draw(g2, 1);
+        g2.setColor(color);
+        g2.fillOval((int)xpos, (int)ypos, (int)(2 * radius), (int)(2 * radius));
+        g2.setColor(Color.BLACK);
     }
 
-    public void draw(Graphics2D g2, float opacity) {
+    public void updatedelta(ArrayList<Sprite> otherplanets) {
+        Vector gravitationalAcceleration = new Vector(0,0);
+        for (Sprite p : otherplanets) {
+            if (p != this) {
+                gravitationalAcceleration.add(ForceHelper.acceleration(p, this));
+//                System.out.println(gravitationalAcceleration);
+            }
+        }
+        delta.add(gravitationalAcceleration);
     }
 
-    /**
-     * Moves the pic in the direction the Sprite is facing (dir).
-     */
-    public void update() {
+    public void update(ArrayList<Sprite> otherplanets) {
+        updatedelta(otherplanets);
+        xpos += delta.dx * small;
+        ypos += delta.dy * small;
     }
 
     /**
@@ -59,7 +75,9 @@ public abstract class Sprite {
      *
      * @return the bounding Rectangle.
      */
-    public abstract Shape getBoundingShape();
+    public Shape getBoundingShape() {
+        return null;
+    }
 
     public int getID() {
         return id;
@@ -79,5 +97,54 @@ public abstract class Sprite {
         if (other.getID() == getID())    //if ID's match...
             return true;
         return false;
+    }
+
+    public Vector getDelta() {
+        return delta;
+    }
+
+    public void setDelta(Vector delta) {
+        this.delta = delta;
+    }
+
+    public double getMass() {
+        return mass;
+    }
+
+    public void setMass(double mass) {
+        this.mass = mass;
+    }
+
+    public double getXpos() {
+        return xpos;
+    }
+
+    public double getYpos() {
+        return ypos;
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+
+    public void setRadius(double radius) {
+        this.radius = radius;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    public double distanceTo(Sprite other) {
+        return Math.sqrt((xpos - other.getXpos()) * (xpos - other.getXpos()) + (ypos - other.getYpos()) * (ypos - other.getYpos()));
+    }
+
+    public double angleTo(Sprite other) {
+//        return Math.atan2((other.getYpos() - ypos), (other.getXpos() - xpos));
+        return Math.atan2((ypos - other.getYpos()), (xpos - other.getXpos()));
     }
 }

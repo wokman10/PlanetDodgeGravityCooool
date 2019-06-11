@@ -10,15 +10,22 @@ public class Main extends JPanel {
     private Timer timer;
     private boolean[] keys;
 
+    public ArrayList<Sprite> sprites;
+
     public Main() {
         keys = new boolean[512]; //should be enough to hold any key code.
         //TODO: initialize the instance fields.
 
         setup();
 
-        timer = new Timer(40, new ActionListener() {
+        timer = new Timer(1000/60, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
+
+                for (Sprite spr : sprites) {
+                    spr.update(sprites);
+                }
+
                 if (keys[KeyEvent.VK_R]) {
                 }
 
@@ -42,29 +49,33 @@ public class Main extends JPanel {
                     keys[KeyEvent.VK_RIGHT] = false;
                 }
 
-                repaint(); //always the last line.  after updating, refresh the graphics.
+                repaint();
             }
         });
-
 
         timer.start();
 
         setKeyListener();
     }
 
-    //Our paint method.
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
 
         g2.drawString("o", FRAMEWIDTH / 2, FRAMEHEIGHT / 2);
+        for (Sprite spr : sprites) {
+            spr.draw(g2);
+//            System.out.println(spr.toString());
+        }
     }
 
     public void setup() {
+        sprites = new ArrayList();
+        sprites.add(new Sprite(400, 400, new Vector(0, 0), 1000));
+        sprites.add(new Sprite(400, 600, new Vector(-20, 0), 10));
+        sprites.add(new Sprite(600, 600, new Vector(-40, 0), 10));
     }
-    /*
-      You probably don't need to modify this keyListener code.
-       */
+
     public void setKeyListener() {
         addKeyListener(new KeyListener() {
             @Override
