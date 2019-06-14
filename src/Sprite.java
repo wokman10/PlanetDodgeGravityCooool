@@ -10,6 +10,7 @@ public class Sprite {
 
     private static int nextID = 1; //static instance fields- there is ONE shared variable for all objects of this class.
     private static double standardRadius = 10;
+    private static double speedOfLight = 100; // m/s
 
     private double xpos;
     private double ypos;
@@ -19,7 +20,7 @@ public class Sprite {
     private Color color;
     private int id;
 
-    private double small = 1. / 60;
+    private double small = 0.0001;
 
     public Sprite(double xpos, double ypos, Vector initial, double mass) {
         this(xpos, ypos, initial, mass, standardRadius, new Color((int)(Math.random() * 255), (int)(Math.random() * 255), (int)(Math.random() * 255)));
@@ -39,7 +40,7 @@ public class Sprite {
 
     public void draw(Graphics2D g2) {
         g2.setColor(color);
-        g2.fillOval((int)xpos, (int)ypos, (int)(2 * radius), (int)(2 * radius));
+        g2.fillOval((int)(xpos - radius), (int)(ypos - radius), (int)(2 * radius), (int)(2 * radius));
         g2.setColor(Color.BLACK);
     }
 
@@ -56,6 +57,16 @@ public class Sprite {
 
     public void update(ArrayList<Sprite> otherplanets) {
         updatedelta(otherplanets);
+        // Speed of light don't work
+//        if (delta.dx * delta.dx + delta.dy * delta.dy > speedOfLight * speedOfLight) {
+//            delta.setDx(delta.dx * speedOfLight / Math.sqrt(delta.dx * delta.dx + delta.dy * delta.dy));
+//            delta.setDy(delta.dy * speedOfLight / Math.sqrt(delta.dx * delta.dx + delta.dy * delta.dy));
+//        }
+
+//        if (delta.dx * delta.dx + delta.dy * delta.dy > speedOfLight * speedOfLight) {
+//            delta.dx = (delta.dx > 0) ? delta.dx - 100 * small : delta.dx + 100 * small;
+//            delta.dy = (delta.dy > 0) ? delta.dy - 100 * small : delta.dy + 100 * small;
+//        }
         xpos += delta.dx * small;
         ypos += delta.dy * small;
     }
@@ -121,6 +132,14 @@ public class Sprite {
 
     public double getYpos() {
         return ypos;
+    }
+
+    public void setXpos(double xpos) {
+        this.xpos = xpos;
+    }
+
+    public void setYpos(double ypos) {
+        this.ypos = ypos;
     }
 
     public double getRadius() {

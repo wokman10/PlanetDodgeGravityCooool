@@ -9,8 +9,7 @@ public class ForceHelper {
         return instance;
     }
 
-    private static int framewidth = 800, frameheight = 800;
-    private static double speedOfLight = 1000; // m/s
+    private static int framewidth = 1600, frameheight = 800;
     private static double gravitationalconstant = 0.000667;
 
     public ForceHelper() {
